@@ -44,7 +44,7 @@ export class Form extends Component {
                 body: JSON.stringify(userData),
             });
 
-            const result = await response.json();
+            const result = await response.json();   
             this.setState({ message: result.message });
         } catch (error) {
             console.error('Error:', error);
