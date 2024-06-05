@@ -1,7 +1,54 @@
 import { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, navigate } from "react-router-dom";
 
 export class SignInForm extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      message: ''
+    };
+  }
+
+  handleChange = (event) => {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const { email, password } = this.state;
+
+    const userData = {
+      email,
+      password,
+    };
+
+    try {
+      const response = await fetch('http://localhost:4000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        this.props.history.push('/');
+      } else {
+        this.setState({ message: result.message });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      this.setState({ message: 'An error occurred. Please try again.' });
+    }
+  }
+
+
   render() {
     return (
       <main className="page-wrapper">
@@ -40,28 +87,45 @@ export class SignInForm extends Component {
                     <span>Or continue with</span>
                     <hr />
                   </div>
-                  <form>
-                    <div class="input-section mail-section">
-                      <div class="icon">
-                        <i class="feather-mail"></i>
+                  <form onSubmit={this.handleSubmit}>
+                    <div className="input-section mail-section">
+                      <div className="icon">
+                        <i className="feather-mail"></i>
                       </div>
-                      <input type="email" placeholder="Enter email address" />
+                      <input
+                        name="email"
+                        value={this.state.email}
+                        onChange={this.handleChange}
+                        type="email"
+                        placeholder="Enter email address"
+                        required
+                      />
                     </div>
-                    <div class="input-section password-section">
-                      <div class="icon">
-                        <i class="feather-lock"></i>
+                    <div className="input-section password-section">
+                      <div className="icon">
+                        <i className="feather-lock"></i>
                       </div>
-                      <input type="password" placeholder="Password" />
+                      <input
+                        name="password"
+                        value={this.state.password}
+                        onChange={this.handleChange}
+                        type="password"
+                        placeholder="Password"
+                        required
+                      />
                     </div>
-                    <div class="forget-text">
-                      <a class="btn-read-more" href="#">
+                    <div className="forget-text">
+                      <a className="btn-read-more" href="#">
                         <span>Forgot password</span>
                       </a>
                     </div>
-                    <button type="submit" class="btn-default">
+                    <Link to={"/"}>
+                    <button type="submit" className="btn-default">
                       Sign In
                     </button>
+                    </Link>
                   </form>
+                  {this.state.message && <p>{this.state.message}</p>}
                 </div>
                 <div class="signup-box-footer">
                   <div class="bottom-text">
@@ -79,3 +143,5 @@ export class SignInForm extends Component {
     );
   }
 }
+
+
